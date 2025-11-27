@@ -29,25 +29,111 @@ We have built a complete production-ready application for web reconnaissance and
   - Interactive ChatBox.
 - **Pages**: Home, Dashboard, Details.
 
-## Verification
+## Setup & Verification
 
-### 1. Backend Startup
-Run `uvicorn app.main:app --reload` in `backend/`.
-- Verify `http://localhost:8000/docs` loads.
-- Verify `http://localhost:8000/docs` loads.
-- Check MongoDB connection (ensure `mongod` is running).
+### Prerequisites
+1. **Install MongoDB**: Download from [mongodb.com](https://www.mongodb.com/try/download/community) and install.
+2. **Start MongoDB**: 
+   ```powershell
+   # Check if MongoDB is running
+   mongod --version
+   # Start MongoDB (usually runs automatically after install)
+   # Or manually: net start MongoDB
+   ```
 
-### 2. Frontend Startup
-Run `npm run dev` in `frontend/`.
-- Verify `http://localhost:5173` loads.
-- Test Theme Toggle.
+### 1. Environment Configuration
 
-### 3. End-to-End Scan
-1. Enter `https://example.com` on Home.
-2. Click Start.
-3. Watch status update on Dashboard.
-4. View findings and AI summary.
-5. Chat with AI about results.
+Create a `.env` file in the `backend` directory:
+```powershell
+cd backend
+New-Item .env -ItemType File
+```
+
+Add the following to `.env`:
+```
+GEMINI_API_KEY=your_actual_gemini_api_key_here
+MONGO_URI=mongodb://localhost:27017
+```
+
+### 2. Backend Startup
+
+**Step-by-step commands:**
+```powershell
+# Navigate to backend
+cd backend
+
+# Activate virtual environment (REQUIRED)
+venv\Scripts\activate
+
+# You should see (venv) in your prompt now
+
+# Start the server
+uvicorn app.main:app --reload
+```
+
+**Verify:**
+- Open browser: `http://localhost:8000/docs`
+- You should see the FastAPI Swagger documentation
+- Check terminal for "Application startup complete"
+- Verify no MongoDB connection errors
+
+### 3. Frontend Startup
+
+**Open a NEW terminal** (keep backend running), then:
+```powershell
+# Navigate to frontend
+cd frontend
+
+# Start dev server
+npm run dev
+```
+
+**Verify:**
+- Open browser: `http://localhost:5173`
+- You should see the NIGHUD AI home page
+- Test the Dark/Light theme toggle (top right)
+- Check that all UI elements load correctly
+
+### 4. End-to-End Scan Test
+
+1. **Enter Target URL**:
+   - Go to `http://localhost:5173`
+   - Enter `https://example.com` in the input field
+   
+2. **Select Modules**:
+   - All modules should be selected by default
+   - Click "Start Scan"
+   
+3. **Monitor Progress**:
+   - You'll be redirected to the scan dashboard
+   - Watch the status change from "pending" → "running" → "completed"
+   - This may take 30-60 seconds
+   
+4. **View Results**:
+   - AI Summary appears at the top with overall risk rating
+   - Module cards show findings count
+   - Click on a module to see detailed findings
+   
+5. **Test AI Chat**:
+   - Use the chatbox on the right side
+   - Ask: "What are the top security concerns?"
+   - AI should respond with context from the scan
+
+### Troubleshooting
+
+**Backend won't start?**
+- Make sure virtual environment is activated: `venv\Scripts\activate`
+- Check MongoDB is running: `mongod --version`
+- Verify `.env` file exists in `backend` directory
+
+**Frontend errors?**
+- Run `npm install` again in the frontend directory
+- Clear browser cache and reload
+
+**Scan stuck on "pending"?**
+- Check backend terminal for errors
+- Verify MongoDB connection in backend logs
+- Ensure GEMINI_API_KEY is set in `.env`
 
 ## Deployment
 
