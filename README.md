@@ -18,6 +18,7 @@ An AI-powered web discovery, recon, and security assistant.
 
 - Python 3.9+
 - Node.js 16+
+- MongoDB 4.4+ (Running locally or remote)
 - Google Gemini API Key
 
 ## Installation
@@ -41,6 +42,7 @@ An AI-powered web discovery, recon, and security assistant.
    - Create `.env` in `backend/app/` (or root of backend) with:
      ```
      GEMINI_API_KEY=your_api_key_here
+     MONGO_URI=mongodb://localhost:27017
      ```
 
 ### Frontend

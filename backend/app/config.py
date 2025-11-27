@@ -10,7 +10,8 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # Database
-    DATABASE_URL: str = "sqlite+aiosqlite:///./nighud.db"
+    MONGO_URI: str = os.getenv("MONGO_URI", "mongodb://localhost:27017")
+    DATABASE_NAME: str = "nighud_db"
     
     # Security
     SECRET_KEY: str = "your-secret-key-here" # Change in production

@@ -1,57 +1,50 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, JSON, Boolean
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-from app.database import Base
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+from beanie import Document, Link
+from pydantic import BaseModel, Field
 
-class Target(Base):
-    __tablename__ = "targets"
-
-    id = Column(Integer, primary_key=True, index=True)
-    url = Column(String, unique=True, index=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+class Target(Document):
+    url: str
+    created_at: datetime = Field(default_factory=datetime.now)
     
-    scans = relationship("Scan", back_populates="target")
+    class Settings:
+        name = "targets"
 
-class Scan(Base):
-    __tablename__ = "scans"
-
-    id = Column(Integer, primary_key=True, index=True)
-    target_id = Column(Integer, ForeignKey("targets.id"))
-    status = Column(String, default="pending") # pending, running, completed, failed
-    started_at = Column(DateTime(timezone=True), server_default=func.now())
-    finished_at = Column(DateTime(timezone=True), nullable=True)
-    modules_run = Column(JSON) # List of modules selected
-    
-    target = relationship("Target", back_populates="scans")
-    findings = relationship("Finding", back_populates="scan")
-    ai_summary = relationship("AISummary", back_populates="scan", uselist=False)
-
-class Finding(Base):
-    __tablename__ = "findings"
-
-    id = Column(Integer, primary_key=True, index=True)
-    scan_id = Column(Integer, ForeignKey("scans.id"))
-    module = Column(String)
-    raw_evidence = Column(Text) # JSON string or raw text
+class Finding(Document):
+    scan_id: str # Storing as string representation of ObjectId or just a reference ID
+    module: str
+    raw_evidence: str # JSON string
     
     # AI Enhanced Fields
-    title = Column(String)
-    severity = Column(String) # Low, Medium, High, Critical
-    score = Column(Integer) # 1-10
-    explanation = Column(Text)
-    impact = Column(Text)
-    fix = Column(Text)
+    title: Optional[str] = None
+    severity: Optional[str] = None
+    score: Optional[int] = None
+    explanation: Optional[str] = None
+    impact: Optional[str] = None
+    fix: Optional[str] = None
     
-    scan = relationship("Scan", back_populates="findings")
+    class Settings:
+        name = "findings"
 
-class AISummary(Base):
-    __tablename__ = "ai_summaries"
-
-    id = Column(Integer, primary_key=True, index=True)
-    scan_id = Column(Integer, ForeignKey("scans.id"))
-    overall_risk = Column(String) # Low, Medium, High, Critical
-    summary_text = Column(Text)
-    remediation_plan = Column(Text)
-    top_risks = Column(JSON) # List of top risks
+class AISummary(Document):
+    scan_id: str
+    overall_risk: Optional[str] = None
+    summary_text: Optional[str] = None
+    remediation_plan: Optional[str] = None
+    top_risks: Optional[List[str]] = []
     
-    scan = relationship("Scan", back_populates="ai_summary")
+    class Settings:
+        name = "ai_summaries"
+
+class Scan(Document):
+    target_id: str
+    status: str = "pending"
+    started_at: datetime = Field(default_factory=datetime.now)
+    finished_at: Optional[datetime] = None
+    modules_run: List[str] = []
+    
+    # We can compute findings and summary via queries, no need for direct relationship fields in basic Beanie usage
+    # unless using Links, but manual query is often simpler for migration.
+    
+    class Settings:
+        name = "scans"
