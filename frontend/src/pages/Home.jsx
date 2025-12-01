@@ -47,7 +47,7 @@ export function Home() {
                     <Shield className="h-12 w-12 text-primary" />
                 </div>
                 <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                    NIGHUD AI RECON SUITE
+                    Senpai AI
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                     Advanced AI-powered web discovery and security reconnaissance.

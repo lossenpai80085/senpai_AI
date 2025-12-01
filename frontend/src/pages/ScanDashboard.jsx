@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react"
 import { useParams, Link } from "react-router-dom"
-import { getScanStatus, getScanResult } from "../api/scanApi"
+import { getScanStatus, getScanResult, downloadPdfReport } from "../api/scanApi"
 import { ModuleCard } from "../components/ModuleCard"
 import { AISummary } from "../components/AISummary"
 import { ChatBox } from "../components/ChatBox"
-import { Loader2, ArrowLeft, RefreshCw } from "lucide-react"
+import { Loader2, ArrowLeft, Download } from "lucide-react"
 
 export function ScanDashboard() {
     const { id } = useParams()
     const [scan, setScan] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [downloadingPdf, setDownloadingPdf] = useState(false)
 
     const fetchScan = async () => {
         try {
@@ -19,6 +20,18 @@ export function ScanDashboard() {
             console.error(err)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleDownloadPdf = async () => {
+        setDownloadingPdf(true)
+        try {
+            await downloadPdfReport(id)
+        } catch (err) {
+            console.error("Failed to download PDF:", err)
+            alert("Failed to generate PDF report")
+        } finally {
+            setDownloadingPdf(false)
         }
     }
 
@@ -53,13 +66,32 @@ export function ScanDashboard() {
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-6xl">
-            <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6">
-                <ArrowLeft className="h-4 w-4" /> Back to Home
+            <Link to="/scans" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6">
+                <ArrowLeft className="h-4 w-4" /> Back to Scans
             </Link>
 
             <div className="flex items-center justify-between mb-8">
                 <h1 className="text-3xl font-bold">Scan Results</h1>
                 <div className="flex items-center gap-3">
+                    {scan.status === "completed" && (
+                        <button
+                            onClick={handleDownloadPdf}
+                            disabled={downloadingPdf}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-all font-medium"
+                        >
+                            {downloadingPdf ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    Generating...
+                                </>
+                            ) : (
+                                <>
+                                    <Download className="h-4 w-4" />
+                                    Download PDF
+                                </>
+                            )}
+                        </button>
+                    )}
                     <span className="text-sm text-muted-foreground">
                         Status: <span className="font-semibold uppercase">{scan.status}</span>
                     </span>

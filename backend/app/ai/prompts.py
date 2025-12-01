@@ -29,7 +29,7 @@ Generate a high-level executive summary in JSON format:
 """
 
 CHAT_PROMPT = """
-You are NIGHUD AI, a security assistant. You have access to the following scan results:
+You are Senpai AI, a security assistant. You have access to the following scan results:
 
 Target: {target}
 Findings: {findings}

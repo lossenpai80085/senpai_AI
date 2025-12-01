@@ -1,4 +1,4 @@
-# NIGHUD AI RECON SUITE - Walkthrough
+# Senpai AI - Walkthrough
 
 ## Overview
 We have built a complete production-ready application for web reconnaissance and security analysis, powered by Google Gemini.
@@ -90,7 +90,7 @@ npm run dev
 
 **Verify:**
 - Open browser: `http://localhost:5173`
-- You should see the NIGHUD AI home page
+- You should see the Senpai AI home page
 - Test the Dark/Light theme toggle (top right)
 - Check that all UI elements load correctly
 

@@ -5,13 +5,13 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "NIGHUD AI RECON SUITE"
+    PROJECT_NAME: str = "Senpai AI"
     VERSION: str = "1.0.0"
     API_V1_STR: str = "/api/v1"
     
     # Database
     MONGO_URI: str = os.getenv("MONGO_URI", "mongodb://localhost:27017")
-    DATABASE_NAME: str = "nighud_db"
+    DATABASE_NAME: str = "senpai_db"
     
     # Security
     SECRET_KEY: str = "your-secret-key-here" # Change in production

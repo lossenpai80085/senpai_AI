@@ -1,4 +1,4 @@
-# NIGHUD AI RECON SUITE
+# Senpai AI
 
 An AI-powered web discovery, recon, and security assistant.
 

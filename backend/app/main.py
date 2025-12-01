@@ -28,4 +28,4 @@ async def on_startup():
 
 @app.get("/")
 async def root():
-    return {"message": "NIGHUD AI RECON SUITE API is running"}
+    return {"message": "Senpai AI API is running"}

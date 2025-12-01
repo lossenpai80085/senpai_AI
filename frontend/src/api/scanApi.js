@@ -31,3 +31,27 @@ export async function chatWithScan(scanId, question) {
     if (!response.ok) throw new Error("Failed to chat")
     return response.json()
 }
+
+export async function getAllScans(skip = 0, limit = 20, status = null) {
+    let url = `${API_BASE}/scan/scans?skip=${skip}&limit=${limit}`
+    if (status) url += `&status=${status}`
+
+    const response = await fetch(url)
+    if (!response.ok) throw new Error("Failed to get scans")
+    return response.json()
+}
+
+export async function downloadPdfReport(scanId) {
+    const response = await fetch(`${API_BASE}/scan/${scanId}/report/pdf`)
+    if (!response.ok) throw new Error("Failed to generate PDF")
+
+    const blob = await response.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `senpai-ai-report-${scanId}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+}

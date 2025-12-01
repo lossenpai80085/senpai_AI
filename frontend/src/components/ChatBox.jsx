@@ -5,7 +5,7 @@ import { chatWithScan } from "../api/scanApi"
 
 export function ChatBox({ scanId }) {
     const [messages, setMessages] = useState([
-        { role: "assistant", content: "Hello! I'm NIGHUD AI. Ask me anything about the scan results." }
+        { role: "assistant", content: "Hello! I'm Senpai AI. Ask me anything about the scan results." }
     ])
     const [input, setInput] = useState("")
     const [loading, setLoading] = useState(false)

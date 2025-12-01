@@ -1,10 +1,12 @@
 from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi.responses import StreamingResponse
 from typing import List
 from pydantic import BaseModel
 from beanie import PydanticObjectId
 
 from app.models import Scan, Target, Finding, AISummary
 from app.services.orchestrator import run_scan
+from app.services.pdf_generator import generate_pdf_report
 
 router = APIRouter()
 
@@ -74,3 +76,59 @@ async def get_scan_result(scan_id: str):
         "findings": findings,
         "summary": summary
     }
+
+@router.get("/scans")
+async def get_all_scans(
+    skip: int = 0,
+    limit: int = 20,
+    status: str = None
+):
+    """Get all scans with optional filtering"""
+    query = Scan.find()
+    
+    if status and status != "all":
+        query = query.find(Scan.status == status)
+    
+    scans = await query.skip(skip).limit(limit).to_list()
+    
+    # Enrich with target URLs
+    result = []
+    for scan in scans:
+        target = await Target.get(PydanticObjectId(scan.target_id))
+        result.append({
+            "id": str(scan.id),
+            "target": target.url if target else "Unknown",
+            "status": scan.status,
+            "modules": scan.modules_run,
+            "created_at": scan.started_at,
+            "finished_at": scan.finished_at
+        })
+    
+    return {"scans": result, "total": len(result)}
+
+@router.get("/{scan_id}/report/pdf")
+async def download_pdf_report(scan_id: str):
+    """Generate and download PDF report for a scan"""
+    try:
+        oid = PydanticObjectId(scan_id)
+    except:
+        raise HTTPException(status_code=400, detail="Invalid ID format")
+    
+    scan = await Scan.get(oid)
+    if not scan:
+        raise HTTPException(status_code=404, detail="Scan not found")
+    
+    target = await Target.get(PydanticObjectId(scan.target_id))
+    findings = await Finding.find(Finding.scan_id == str(scan.id)).to_list()
+    summary = await AISummary.find_one(AISummary.scan_id == str(scan.id))
+    
+    # Generate PDF
+    pdf_buffer = await generate_pdf_report(scan, findings, summary, target)
+    
+    # Return as downloadable file
+    filename = f"senpai-ai-report-{target.url.replace('://', '-').replace('/', '-')}.pdf"
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )

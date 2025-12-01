@@ -9,3 +9,4 @@ pydantic-settings
 dnspython
 beautifulsoup4
 python-whois
+reportlab
